@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.options import Options
 import uuid
 import time
@@ -28,13 +29,13 @@ def get_driver(headless=True):
     return driver
 
 driver = get_driver(HEADLESS)
-
+actions = ActionChains(driver)
 try:
     # Open the url
     url = URL
     driver.get(url)
     expected_title = "ku-tangtee"
-    time.sleep(2)
+    time.sleep(3)
 
     # Confirm title
     if driver.title == expected_title:
@@ -46,7 +47,7 @@ try:
     try:
         search_box = driver.find_element(By.CSS_SELECTOR, "input[placeholder='Search']")
         search_box.send_keys(SEARCH_KEYWORD + Keys.RETURN)
-        time.sleep(2)
+        time.sleep(3)
         print("Search box interacted successfully!")
 
     except Exception as e:
@@ -58,9 +59,9 @@ try:
             EC.visibility_of_element_located((By.CSS_SELECTOR, "button"))
         )
         view_button = driver.find_element(By.XPATH, "//button[contains(text(), 'View')]")
-        view_button.click()
+        actions.move_to_element(view_button).click().perform()
         print("View button clicked successfully!")
-        time.sleep(2)
+        time.sleep(3)
 
     except Exception as e:
         print("View button not found or could not be clicked:", e)
@@ -70,9 +71,9 @@ try:
         login_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Login')]"))
         )
-        login_button.click()
+        actions.move_to_element(login_button).click().perform()
         print("Login button clicked successfully!")
-        time.sleep(2)
+        time.sleep(3)
 
         main_window = driver.current_window_handle
         WebDriverWait(driver, 10).until(EC.number_of_windows_to_be(2))
@@ -97,21 +98,33 @@ try:
         WebDriverWait(driver, 10).until(EC.number_of_windows_to_be(1))
         driver.switch_to.window(main_window)
         print("Logged in successfully via Google OAuth!")
-        time.sleep(2)
+        time.sleep(3)
 
     except Exception as e:
         print("Login failed:", e)
 
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    # Scroll down the page slowly using document.documentElement
+    scroll_pause_time = 1
+    scroll_increment = 100
+
+    last_height = driver.execute_script("return document.documentElement.scrollHeight")
+    print(last_height)
+    while True:
+        driver.execute_script(f"window.scrollBy(0, {scroll_increment});")
+        time.sleep(scroll_pause_time)
+        new_height = driver.execute_script("return document.documentElement.scrollHeight")
+        if new_height == last_height:
+            break
+        last_height = new_height
     print("Scrolled down the page!")
-    time.sleep(2)
+    time.sleep(3)
 
     # Click the Chat button
     try:
         chat_button = WebDriverWait(driver, 20).until(
             EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Chat')]"))
         )
-        chat_button.click()
+        actions.move_to_element(chat_button).click().perform()
         print("Chat button clicked successfully!")
         time.sleep(3)
 
@@ -129,7 +142,7 @@ try:
         )
         chat_input_field.send_keys(test_message + Keys.RETURN)
         print("Message inputted into the chat textarea!")
-        time.sleep(2)
+        time.sleep(3)
 
     except Exception as e:
         print("Chat input field not found:", e)
@@ -144,7 +157,7 @@ try:
                 print(f"Found chat bubble contains the message: {test_message}")
                 chat_input_field.send_keys("Confirmed" + Keys.RETURN)
                 print("Message inputted into the chat textarea!")
-                time.sleep(2)
+                time.sleep(3)
                 break
         else:
             print("Chat bubble with the expected message not found.")
