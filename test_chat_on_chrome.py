@@ -1,5 +1,5 @@
 """Test chat E2E"""
-from decouple import Config
+from decouple import config
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -9,13 +9,11 @@ from selenium.webdriver.chrome.options import Options
 import uuid
 import time
 
-config = Config()
-
 URL = config('URL')
 EMAIL = config('EMAIL')
 PASSWORD = config('PASSWORD')
 SEARCH_KEYWORD = config('SEARCH_KEYWORD')
-HEADLESS = config('HEADLESS', default='True') == 'True'
+HEADLESS = config('HEADLESS', default='False') == 'True'
 
 def get_driver(headless=True):
     """Construct driver"""
