@@ -104,6 +104,7 @@ try:
 
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     print("Scrolled down the page!")
+    time.sleep(2)
 
     # Click the Chat button
     try:
@@ -141,6 +142,9 @@ try:
         for bubble in chat_bubbles:
             if test_message in bubble.text:
                 print(f"Found chat bubble contains the message: {test_message}")
+                chat_input_field.send_keys("Confirmed" + Keys.RETURN)
+                print("Message inputted into the chat textarea!")
+                time.sleep(2)
                 break
         else:
             print("Chat bubble with the expected message not found.")
