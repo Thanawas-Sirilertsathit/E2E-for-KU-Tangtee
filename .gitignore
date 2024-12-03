@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 
 screenshot.png
+secret_base/
